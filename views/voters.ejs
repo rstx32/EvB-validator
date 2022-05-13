@@ -1,0 +1,300 @@
+<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p" crossorigin="anonymous"></script>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+
+<div class="row">
+    <!-- card voter count -->
+    <div class="col-xl-2 col-md-6 mb-4">
+        <div class="card border-left-primary shadow h-100 py-2">
+            <div class="card-body">
+                <div class="row align-items-center">
+                    <div class="col mr-2">
+                        <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">
+                            Total Voters
+                        </div>
+                        <div class="h5 mb-0 font-weight-bold text-gray-800"><%= voters.totalDocs %></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end card voter count -->
+</div>
+
+<!-- Content Row -->
+<div class="row">
+    <div class="col-lg-5">
+
+        <!-- card voter -->
+        <div class="card shadow mb-4">
+            <!-- card header -->
+            <div class="card-header py-3">
+                <h6 class="m-0 font-weight-bold text-primary">List of All Voters</h6>
+            </div>
+            <!-- card header -->
+
+            <!-- card body -->
+            <div class="card-body table-responsive">
+
+                <div class="row">
+                    <div class="col-sm-2">
+                        <div class="col mb-3">
+                            <select class="form-select" id="displayItem" onchange="this.options[this.selectedIndex].value && (window.location = this.options[this.selectedIndex].value);">
+                                <% for( let index = 1; index <= 10; index++ ) { %>
+                                    <% if (index === voters.limit) { %>
+                                        <option value="voters?page=1&limit=<%= index %>" selected><%= index %></option>
+                                    <% } else{ %>
+                                        <option value="voters?page=1&limit=<%= index %>"><%= index %></option>
+                                    <% } %> 
+                                <% } %>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <table class="table">
+
+                    <!-- table header -->
+                    <thead>
+                        <tr>
+                            <th scope="col">#</th>
+                            <th scope="col">Fullname</th>
+                            <th scope="col">Email</th>
+                            <th scope="col">Detail</th>
+                        </tr>
+                    </thead>
+                    <!-- table header -->
+                    
+                    <!-- tabel content -->
+                    <tbody>
+                        <% num = voters.limit * (voters.page-1) %> 
+                        <% voters.docs.forEach((v) => { num++ %>
+                            <tr>
+                                <th scope="row">
+                                    <%= num %>
+                                </th>
+                                <td>
+                                    <%= v.fullname %>
+                                </td>
+                                <td>
+                                    <%= v.email %>
+                                </td>
+                                <td>
+                                    <!-- modal button detail voter -->
+                                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#modal<%= v._id %>">
+                                        <i class="bi bi-info-square"></i>
+                                    </button>
+                                    <!-- end modal button detail voter -->
+
+                                    <!-- modal box detail voter -->
+                                    <div class="modal fade" id="modal<%= v._id %>" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                                            <div class="modal-content">
+
+                                                <!-- modal header -->
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="modalTitle">
+                                                        Detail Voter
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                
+                                                <!-- modal body -->
+                                                <div class="modal-body">
+                                                    <div class="container">
+                                                        <div class="row">
+
+                                                            <!-- voter photo -->
+                                                            <div class="col-3">
+                                                                <img src="http://<%= process.env.API_URL %>/photo/voters/<%= v.photo %>" class="img-fluid">
+                                                            </div>
+                                                            <!-- end voter photo -->
+
+                                                            <!-- voter data detail -->
+                                                            <div class="col-9">
+                                                                <div class="container-fluid">
+                                                                    <div class="row table-responsive">
+                                                                        <table class="table">
+                                                                            <thead>
+                                                                                <tr>
+                                                                                    <th colspan="2">
+                                                                                        <h3>
+                                                                                            <%= v.fullname %>
+                                                                                        </h3>
+                                                                                    </th>
+                                                                                </tr>
+                                                                            </thead>
+                                                                            <tbody>
+                                                                                <tr>
+                                                                                    <th scope="row">
+                                                                                        NIM</th>
+                                                                                    <td>
+                                                                                        <%= v.nim %>
+                                                                                    </td>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <th scope="row">
+                                                                                        Email</th>
+                                                                                    <td>
+                                                                                        <%= v.email %>
+                                                                                    </td>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <th scope="row">
+                                                                                        Password</th>
+                                                                                    <td>
+                                                                                        <%= v.password %>
+                                                                                    </td>
+                                                                                </tr>
+                                                                                <tr>
+                                                                                    <th scope="row">
+                                                                                        Public Key</th>
+                                                                                    <td>
+                                                                                        <%= v.public_key %>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            </tbody>
+                                                                        </table>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <!-- end voter data detail -->
+
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                                <!-- end modal body -->
+
+                                                <!-- modal footer -->
+                                                <div class="modal-footer">
+
+                                                    <!-- modal button delete voter -->
+                                                    <form method="post" action="/voters?_method=DELETE">
+                                                        <input type="hidden" name="email" value="<%= v.email %>">
+                                                        <button type="submit" class="btn btn-danger" data-bs-dismiss="modal" onclick="return confirm('are you sure?')">Delete</button>
+                                                    </form>
+                                                    <!-- end modal button delete voter -->
+
+                                                    <!-- modal button edit voter -->
+                                                    <button type="button" class="btn btn-success" data-bs-toggle="modal" data-bs-target="#editVoter<%= v._id %>">
+                                                        Edit
+                                                    </button>
+                                                    <!-- end modal button edit voter -->
+
+                                                </div>
+                                                <!-- end modal footer -->
+                                                
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- end modal box detail voter -->
+
+                                    <!-- modal box edit voter -->
+                                    <div class="modal fade" id="editVoter<%= v._id %>" aria-hidden="true" aria-labelledby="exampleModalToggleLabel2" tabindex="-1">
+                                        <div class="modal-dialog modal-dialog-centered modal-lg">
+                                            <div class="modal-content">
+
+                                                <!-- modal header -->
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="exampleModalLabel">
+                                                        Edit Voter : <%= v.fullname %>
+                                                    </h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <!-- end modal header -->
+
+                                                <!-- modal body -->
+                                                <div class="modal-body">
+                                                    <!-- form -->
+                                                    <form method="post" action="/voters?_method=PUT" enctype="multipart/form-data">
+                                                        <!-- hidden input value -->
+                                                        <input type="hidden" name="email" value="<%= v.email %>">
+                                                        <input type="hidden" name="nim" value="<%= v.nim %>">
+                                                        
+                                                        <!-- fullname -->
+                                                        <div class="form-floating mb-3">
+                                                            <input type="text" name="fullname" class="form-control" id="floatingInput" placeholder="fullname" value="<%= v.fullname %>">
+                                                            <label for="floatingInput">
+                                                                New Full Name
+                                                            </label>
+                                                        </div>
+                                                        
+                                                        <!-- photo upload -->
+                                                        <div class="mb-3">
+                                                            <label for="formFileSm" class="form-label">Photo
+                                                                Upload</label>
+                                                            <input class="form-control form-control-sm" id="formFileSm" name="voterPhotoUpload" type="file">
+                                                        </div>
+                                                        
+                                                        <!-- submit -->
+                                                        <button type="submit" class="btn btn-primary">Save</button>
+                                                    </form>
+                                                    <!-- end form -->
+                                                
+                                                </div>
+                                                <!-- end modal body -->
+                                            
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <!-- end modal box edit voter -->
+                                </td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                    <!-- end tabel content -->
+
+                </table>
+
+                <nav aria-label="Page navigation example">
+                    <ul class="pagination justify-content-center">
+                      <% if (voters.hasPrevPage) { %>
+                        <li class="page-item">
+                            <a class="page-link" href="/voters?page=<%= voters.page-1 %>&limit=<%= voters.limit %>">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                      <% } else { %>      
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#">
+                                <span aria-hidden="true">&laquo;</span>
+                            </a>
+                        </li>
+                      <% } %> 
+
+                      <% for( let index = 1; index <= voters.totalPages; index++ ) { %>
+                        <% if (voters.page === index) { %>
+                            <li class="page-item active">
+                                <a class="page-link" href="/voters?page=<%= index %>&limit=<%= voters.limit %>"><%= index %></a>
+                            </li>
+                        <% } else {%>
+                            <li class="page-item">
+                                <a class="page-link" href="/voters?page=<%= index %>&limit=<%= voters.limit %>"><%= index %></a>
+                            </li>
+                        <% } %> 
+                      <% } %>
+
+                      <% if (voters.hasNextPage) { %>
+                        <li class="page-item">
+                            <a class="page-link" href="/voters?page=<%= voters.page+1 %>&limit=<%= voters.limit %>">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                      <% } else { %>      
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#">
+                                <span aria-hidden="true">&raquo;</span>
+                            </a>
+                        </li>
+                      <% } %> 
+                    </ul>
+                </nav>
+
+            </div>
+            <!-- end card body -->
+
+        </div>
+        <!-- end card voter -->
+    </div>
+</div>
+<!-- End Content Row -->
