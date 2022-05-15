@@ -12,4 +12,14 @@ const getCandidates = async () => {
     return await candidates.json()
 }
 
-export {getVoters, getCandidates}
+const importVoters = async () => {
+    const voters = await fetch(`http://${process.env.API_URL}/allvoters`)
+    return await voters.json()
+}
+
+const importCandidates = async () => {
+    const candidates = await fetch(`http://${process.env.API_URL}/allcandidates`)
+    return await candidates.json()
+}
+
+export {getVoters, getCandidates, importVoters, importCandidates}
