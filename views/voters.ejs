@@ -19,6 +19,21 @@
         </div>
     </div>
     <!-- end card voter count -->
+
+    <% if (!isValidated) { %>
+        <!-- card validate voter -->
+        <div class="col-lg-2 col-md-9 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <!-- modal button validate voter -->
+                    <button type="button" class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#validateVoter">
+                        <i class="bi bi-person-plus"> Validate Voter</i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        <!-- end card validate voter -->
+    <% } %>
 </div>
 
 <!-- Content Row -->
@@ -298,3 +313,52 @@
     </div>
 </div>
 <!-- End Content Row -->
+
+<!-- Modal -->
+<div class="modal fade" id="validateVoter" tabindex="-1" role="dialog" aria-labelledby="confirmModalLabel" aria-hidden="true">
+    <div class="modal-dialog" role="document">
+        <div class="modal-content">
+            
+            <div class="modal-header">
+                <h5 class="modal-title" id="confirmModalLabel">Are You Sure?</h5>
+            </div>
+
+            <div class="modal-body">
+                <!-- hidden form -->
+                <form method="post" action="/voters" id="formSubmit">
+                    <input type="hidden" name="voters" id="voters" value="<%= validator %>">
+                </form>
+                
+                <!-- checkbox form -->
+                <div class="form-check">
+                    <input class="form-check-input" type="checkbox" id="checkboxConfirmation" onchange="enableButton()">
+                    <label class="form-check-label">
+                        Yes, i'm sure that voters data is <b>correct</b>
+                    </label>
+                </div>
+            </div>
+
+            <div class="modal-footer">
+                <button class="btn btn-secondary" type="button" data-dismiss="modal">Cancel</button>
+                <button class="btn btn-primary" onclick="proses()" id="submitButton" name="voteButton">Submit!</a>
+            </div>
+
+        </div>
+    </div>
+</div>
+
+<script>
+    var btn = document.getElementById(`submitButton`)
+    btn.disabled = true
+    var form = document.getElementById("formSubmit")
+
+    function enableButton(){
+        var checkbox = document.getElementById(`checkboxConfirmation`)
+
+        checkbox.checked ? btn.disabled = false : btn.disabled = true
+    }
+
+    function proses(){
+        form.submit()
+    }
+</script>
