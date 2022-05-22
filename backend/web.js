@@ -5,16 +5,14 @@ import passport from 'passport'
 import session from 'express-session'
 import connectEnsureLogin from 'connect-ensure-login'
 import flash from 'connect-flash'
-import xlsx from 'xlsx'
-import { getCandidates, getVoters, importVoters } from './getAPI.js'
+import { getCandidates, getVoters } from './getAPI.js'
 import {
   getValidator,
-  voterValidate,
-  isVoterValidated,
-  isCandidateValidated,
-  candidateValidate,
+  getSingleValidator,
+  validate,
+  acceptSolve,
 } from './db.js'
-import User from './model/user.js'
+import Validator from './model/validator.js'
 dotenv.config({ path: 'backend/config/.env' })
 
 const app = express()
@@ -33,11 +31,11 @@ const app = express()
   .use(passport.session())
   .use(flash())
 
-passport.use(User.createStrategy())
-passport.serializeUser(User.serializeUser())
-passport.deserializeUser(User.deserializeUser())
+passport.use(Validator.createStrategy())
+passport.serializeUser(Validator.serializeUser())
+passport.deserializeUser(Validator.deserializeUser())
 
-// login page
+// auth
 app.get('/login', (req, res) => {
   const errorMessage = req.flash('messageFailure')
   const successMessage = req.flash('messageSuccess')
@@ -61,13 +59,12 @@ app.post(
   }),
   (req, res) => {}
 )
-// end login page
 
-// logout
 app.get('/logout', (req, res) => {
   req.logout()
   res.redirect('/login')
 })
+// end auth
 
 // root page
 app.get('/', connectEnsureLogin.ensureLoggedIn(), (req, res) => {
@@ -76,47 +73,18 @@ app.get('/', connectEnsureLogin.ensureLoggedIn(), (req, res) => {
 
 // voters
 app.get('/voters', connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
-  // if query is empty, then add default query
-  if (Object.keys(req.query).length === 0) {
-    req.query = {
-      limit: 5,
-      page: 1,
-    }
-  }
-
-  const validator = req.user._id
+  const user = req.user._id
   const voters = await getVoters(req.query)
-  const isValidated = await isVoterValidated(req.user._id)
+  const validator = await getSingleValidator(user)
 
   res.render('voters', {
     layout: 'layouts/main-layout',
     title: 'voters',
     voters,
+    user,
     validator,
-    isValidated,
   })
 })
-
-app.post('/voters', async (req, res) => {
-  await voterValidate(req.body.voters)
-  res.redirect('/validator')
-})
-
-app.get('/download-voters', async (req, res) => {
-  const voters = await importVoters()
-  const fix = voters.docs
-  fix.forEach((v) => {
-    delete v._id
-    delete v.__v
-  })
-
-  const worksheet = xlsx.utils.json_to_sheet(fix)
-  const workbook = xlsx.utils.book_new()
-
-  xlsx.utils.book_append_sheet(workbook, worksheet, 'Sheet 1')
-  xlsx.writeFile(workbook, 'sample.xlsx')
-})
-// end voters
 
 // candidates
 app.get(
@@ -124,26 +92,18 @@ app.get(
   connectEnsureLogin.ensureLoggedIn(),
   async (req, res) => {
     const candidates = await getCandidates()
-    const candidatesCount = candidates.length
-    const validator = req.user._id
-    const isValidated = await isCandidateValidated(req.user._id)
+    const user = req.user._id
+    const validator = await getSingleValidator(user)
 
     res.render('candidates', {
       layout: 'layouts/main-layout',
       title: 'candidates',
       candidates,
-      candidatesCount,
+      user,
       validator,
-      isValidated,
     })
   }
 )
-
-app.post('/candidates', async (req, res) => {
-  await candidateValidate(req.body.candidates)
-  res.redirect('/validator')
-})
-// end candidates
 
 // validator
 app.get('/validator', async (req, res) => {
@@ -158,6 +118,31 @@ app.get('/validator', async (req, res) => {
   })
 })
 
+// validation
+app.post('/validate/:type', async (req, res, next) => {
+  if (req.params.type === 'voter' || req.params.type === 'candidate') {
+    await validate(req.body, req.params.type)
+    res.redirect('/validator')
+  } else {
+    res.redirect(next)
+  }
+})
+
+// accept solve
+app.post('/solve/:type', async (req, res, next) => {
+  if (req.params.type === 'voter' || req.params.type === 'candidate') {
+    await acceptSolve(req.body, req.params.type)
+    res.redirect('/validator')
+  } else {
+    res.redirect(next)
+  }
+})
+
+// page not found
+app.use((req, res) => {
+  res.status(404).send('404 : not found')
+})
+
 app.listen(process.env.HTTP_PORT, () => {
   console.log(
     `server is listening on http://localhost:${process.env.HTTP_PORT}`
@@ -165,7 +150,8 @@ app.listen(process.env.HTTP_PORT, () => {
 })
 
 // run this for the first time!
-// User.register({username: 'validator1', active: false}, '123')
-// User.register({username: 'validator2', active: false}, '123')
-// User.register({username: 'validator3', active: false}, '123')
-// User.register({username: 'validator4', active: false}, '123')
+// Validator.register({username: 'validator1', active: false}, '123')
+// Validator.register({username: 'validator2', active: false}, '123')
+// Validator.register({username: 'validator3', active: false}, '123')
+// Validator.register({username: 'validator4', active: false}, '123')
+// Validator.register({username: 'validator5', active: false}, '123')

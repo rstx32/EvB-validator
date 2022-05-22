@@ -20,18 +20,14 @@ const VotersFix = mongoose.model(
     },
     password: {
       type: String,
-      // required: true,
+      default: null,
     },
     public_key: {
       type: String,
-      unique: true,
-      // required: true,
+      default: null,
     },
-    photo: {
-      type: String,
-      required: true,
-    },
+    photo: String,
   })
 )
 
-export { VotersFix }
+export default VotersFix

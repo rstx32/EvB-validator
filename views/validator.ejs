@@ -1,3 +1,4 @@
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.2/font/bootstrap-icons.css">
 <!-- Content Row -->
 <div class="row">
     <div class="col-lg-4">
@@ -23,18 +24,30 @@
                         <th scope="row"><%= index %></th>
                         <td><%= v.username %> </td>
                         <td>
-                          <% if (v.voter) { %>
-                            validated
-                          <% } else { %>
-                            x
-                          <% } %> 
+                          <% if (v.voterStatus==='valid') { %>
+                            <div class="alert alert-success" role="alert">
+                              valid <i class="bi bi-check-square"></i>
+                            </div>
+                          <% } else if (v.voterStatus==='invalid') { %>
+                            <div class="alert alert-danger" role="alert">
+                              invalid <i class="bi bi-x-square"></i>
+                            </div>
+                          <% } else {%>
+                            unvalidated
+                          <% } %>  
                         </td>
                         <td>
-                          <% if (v.candidate) { %>
-                            validated
-                          <% } else { %>
-                            x
-                          <% } %>   
+                          <% if (v.candidateStatus==='valid') { %>
+                            <div class="alert alert-success" role="alert">
+                              valid <i class="bi bi-check-square"></i>
+                            </div>
+                          <% } else if (v.candidateStatus==='invalid') { %>
+                            <div class="alert alert-danger" role="alert">
+                              invalid <i class="bi bi-x-square"></i>
+                            </div>
+                          <% } else {%>
+                            unvalidated
+                          <% } %> 
                         </td>
                       </tr>
                     <% index++ }) %>

@@ -19,8 +19,7 @@
     "mongoose": "^6.3.3",
     "node-fetch": "^3.2.4",
     "passport": "^0.5.2",
-    "passport-local-mongoose": "^7.0.0",
-    "xlsx": "^0.18.5"
+    "passport-local-mongoose": "^7.0.0"
   },
   "type": "module"
 }
