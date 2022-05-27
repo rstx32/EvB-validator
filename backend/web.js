@@ -11,6 +11,8 @@ import {
   getSingleValidator,
   validate,
   acceptSolve,
+  generateJWT,
+  checkComplaint,
 } from './db.js'
 import Validator from './model/validator.js'
 dotenv.config({ path: 'backend/config/.env' })
@@ -22,7 +24,7 @@ const app = express()
   .use(express.static('public'))
   .use(
     session({
-      secret: process.env.SECRET,
+      secret: process.env.SESSION_SECRET,
       resave: false,
       saveUninitialized: true,
     })
@@ -74,8 +76,10 @@ app.get('/', connectEnsureLogin.ensureLoggedIn(), (req, res) => {
 // voters
 app.get('/voters', connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
   const user = req.user._id
-  const voters = await getVoters(req.query)
+  const voters = await getVoters(req.query, user)
   const validator = await getSingleValidator(user)
+  const errorMessage = req.flash('errorMessage')
+  const isComplaintExist = await checkComplaint()
 
   res.render('voters', {
     layout: 'layouts/main-layout',
@@ -83,6 +87,8 @@ app.get('/voters', connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
     voters,
     user,
     validator,
+    errorMessage,
+    isComplaintExist,
   })
 })
 
@@ -91,8 +97,8 @@ app.get(
   '/candidates',
   connectEnsureLogin.ensureLoggedIn(),
   async (req, res) => {
-    const candidates = await getCandidates()
     const user = req.user._id
+    const candidates = await getCandidates(user)
     const validator = await getSingleValidator(user)
 
     res.render('candidates', {
@@ -120,11 +126,17 @@ app.get('/validator', async (req, res) => {
 
 // validation
 app.post('/validate/:type', async (req, res, next) => {
-  if (req.params.type === 'voter' || req.params.type === 'candidate') {
-    await validate(req.body, req.params.type)
-    res.redirect('/validator')
+  const isComplaintExist = await checkComplaint()
+  if (req.params.type === 'voter' && isComplaintExist.length > 0) {
+    req.flash('errorMessage', 'complaint still exist, wait for admin solve')
+    res.redirect('/voters')
   } else {
-    res.redirect(next)
+    if (req.params.type === 'voter' || req.params.type === 'candidate') {
+      await validate(req.body, req.params.type)
+      res.redirect('/validator')
+    } else {
+      res.redirect(next)
+    }
   }
 })
 
@@ -151,7 +163,12 @@ app.listen(process.env.HTTP_PORT, () => {
 
 // run this for the first time!
 // Validator.register({username: 'validator1', active: false}, '123')
+// generateJWT('validator1')
 // Validator.register({username: 'validator2', active: false}, '123')
+// generateJWT('validator2')
 // Validator.register({username: 'validator3', active: false}, '123')
+// generateJWT('validator3')
 // Validator.register({username: 'validator4', active: false}, '123')
+// generateJWT('validator4')
 // Validator.register({username: 'validator5', active: false}, '123')
+// generateJWT('validator5')
