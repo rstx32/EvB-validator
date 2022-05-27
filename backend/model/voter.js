@@ -26,9 +26,13 @@ const voterSchema = new mongoose.Schema({
     default: null,
   },
   photo: String,
+  key: {
+    type: String,
+    min: 6,
+    max: 6,
+  },
 })
 
 const Voter = mongoose.model('voter', voterSchema)
-const VoterFix = mongoose.model('voter-fix', voterSchema)
 
-export { Voter, VoterFix }
+export { Voter }
