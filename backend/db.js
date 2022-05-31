@@ -2,16 +2,23 @@ import Validator from './model/validator.js'
 import { Voter } from './model/voter.js'
 import { Admin } from './model/admin.js'
 import { Complaint } from './model/complaint.js'
+import { gmail, mailtrap } from './email.js'
 import jsonwebtoken from 'jsonwebtoken'
-import nodemailer from 'nodemailer'
+import randomstring from 'randomstring'
 import ejs from 'ejs'
 
+// get all validators
 const getValidator = async () => {
   return await Validator.find()
 }
 
-const getSingleValidator = async (validatorID) => {
-  return await Validator.findById(validatorID)
+// get a validator
+const getSingleValidator = async (key, type) => {
+  if (type === 'findbyid') return await Validator.findById(key)
+  else if (type === 'findbyemail')
+    return await Validator.findOne({ email: key })
+  else if (type === 'findbyresetkey')
+    return await Validator.findOne({ key: key })
 }
 
 // create validation
@@ -114,23 +121,6 @@ const lockAdmin = async (type) => {
 
 // send email to voter
 const sendEmail = async () => {
-  const gmail = nodemailer.createTransport({
-    service: 'gmail',
-    auth: {
-      user: 'xtsr23@gmail.com',
-      pass: 'Mas.ganteng@32',
-    },
-  })
-
-  const mailtrap = nodemailer.createTransport({
-    host: 'smtp.mailtrap.io',
-    port: 2525,
-    auth: {
-      user: '4e56d2a27d9572',
-      pass: '81878f80487ec9',
-    },
-  })
-
   const voters = await Voter.find()
   const extractValue = (arr, prop) => {
     let extractedValue = arr.map((item) => item[prop])
@@ -162,7 +152,7 @@ const sendEmail = async () => {
 
 // accept solve from admin
 const acceptSolve = async (data, type) => {
-  const validator = await getSingleValidator(data.validatorID)
+  const validator = await getSingleValidator(data.validatorID, 'findbyid')
   let acceptStatus = '',
     status = '',
     reason = ''
@@ -225,11 +215,110 @@ const checkComplaint = async () => {
   })
 }
 
+// create validator account from environment
+const isAccountExist = async (username) => {
+  return await Validator.findOne({ username: username })
+}
+
+// create validator account
+const createAccount = async (username, email) => {
+  const account = await isAccountExist(username)
+  const password = randomstring.generate(8)
+
+  if (account === null) {
+    // register validator
+    Validator.register({ username: username, active: false }, password)
+
+    // insert validator email to database
+    setTimeout(async () => {
+      await Validator.updateOne(
+        {
+          username: username,
+        },
+        {
+          $set: {
+            email: email,
+          },
+        }
+      )
+    }, 500)
+
+    // generate JWT for each validator
+    setTimeout(() => {
+      generateJWT(username)
+    }, 500)
+
+    // send password to validator's email
+    mailtrap.sendMail({
+      from: 'evb-organizer@evb.com',
+      to: email,
+      subject: 'EvB Validator Access',
+      text: `validator password for access : ${password}`,
+    })
+  } else {
+    return
+  }
+}
+
+// set reset key to validator's email
+const sendResetKey = async (email) => {
+  const validator = getSingleValidator(email, 'findbyemail')
+  if (validator !== null) {
+    const randomkey = randomstring.generate(6)
+
+    await Validator.updateOne(
+      {
+        email: email,
+      },
+      {
+        $set: {
+          key: randomkey,
+        },
+      }
+    )
+
+    mailtrap.sendMail({
+      from: 'evb-organizer@evb.com',
+      to: email,
+      subject: 'Validator Reset Password',
+      text: `validator password reset key : ${randomkey}`,
+    })
+
+    return true
+  } else {
+    return false
+  }
+}
+
+// reset password validator
+const resetPassword = async (data) => {
+  const validator = await getSingleValidator(data.email, 'findbyemail')
+
+  const result = await Validator.findByUsername(validator.username)
+  await result.setPassword(data.password)
+  await result.save()
+
+  await Validator.updateOne(
+    {
+      username: validator.username,
+    },
+    {
+      $set: {
+        key: null,
+      },
+    }
+  )
+
+  return result
+}
+
 export {
   getValidator,
   getSingleValidator,
   validate,
   acceptSolve,
-  generateJWT,
   checkComplaint,
+  createAccount,
+  sendResetKey,
+  resetPassword,
 }
