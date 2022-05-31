@@ -13,7 +13,7 @@ const getVoters = async (query, validatorID) => {
   }
 
   let voters = {}
-  const validatorToken = await getSingleValidator(validatorID)
+  const validatorToken = await getSingleValidator(validatorID, 'findbyid')
   const token = validatorToken.token
 
   if (query.fullname === undefined) {
@@ -42,7 +42,7 @@ const getVoters = async (query, validatorID) => {
 }
 
 const getCandidates = async (validatorID) => {
-  const validatorToken = await getSingleValidator(validatorID)
+  const validatorToken = await getSingleValidator(validatorID, 'findbyid')
   const token = validatorToken.token
   const candidates = await fetch(
     `http://${process.env.API_URL}/export/candidate`,
