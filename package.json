@@ -2,9 +2,9 @@
   "name": "evb-validator",
   "version": "1.0.0",
   "description": "evb data validator",
-  "main": "index.js",
+  "main": "/backend/web.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "start": "node ./backend/web.js"
   },
   "author": "rstx",
   "license": "ISC",
@@ -21,7 +21,8 @@
     "node-fetch": "^3.2.4",
     "nodemailer": "^6.7.5",
     "passport": "^0.5.2",
-    "passport-local-mongoose": "^7.0.0"
+    "passport-local-mongoose": "^7.0.0",
+    "randomstring": "^1.2.2"
   },
   "type": "module"
 }
