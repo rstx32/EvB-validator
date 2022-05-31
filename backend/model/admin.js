@@ -5,6 +5,8 @@ mongoose.connect(`${process.env.MONGODB_URL}`)
 const adminSchema = new mongoose.Schema({
   username: String,
   password: String,
+  email: String,
+  key: String,
   voterAccess: {
     type: String,
     enum: ['allow', 'deny'],
