@@ -4,7 +4,8 @@
   "description": "evb data validator",
   "main": "/backend/web.js",
   "scripts": {
-    "start": "node ./backend/web.js"
+    "start": "node ./backend/web.js",
+    "dev": "HTTP_PORT=5003 nodemon ./backend/web.js"
   },
   "author": "rstx",
   "license": "ISC",
