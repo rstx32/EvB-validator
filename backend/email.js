@@ -17,4 +17,4 @@ const mailtrap = nodemailer.createTransport({
   },
 })
 
-export {gmail, mailtrap}
+export { gmail, mailtrap }
