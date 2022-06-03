@@ -27,9 +27,17 @@ const voterSchema = new mongoose.Schema({
   },
   photo: String,
   key: {
-    type: String,
-    min: 6,
-    max: 6,
+    registration: {
+      type: String,
+      min: 6,
+      max: 6,
+    },
+    reset_password: {
+      type: String,
+      min: 6,
+      max: 6,
+      default: null,
+    },
   },
 })
 
