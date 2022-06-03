@@ -132,7 +132,7 @@ const sendEmail = async () => {
     setTimeout(async () => {
       const fileHTML = await ejs.renderFile('views/email.ejs', {
         voter: voters[interval].fullname,
-        key: voters[interval].key,
+        key: voters[interval].key.registration,
       })
       const mailOptions = {
         from: 'evb-organizer@evb.com',
