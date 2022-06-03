@@ -46,7 +46,7 @@ app.get('/login', (req, res) => {
 
   res.render('auth/login', {
     layout: 'layouts/auth-layout',
-    title: 'login',
+    title: 'Login EvB-validator',
     flashMessage: { errorMessage, successMessage },
   })
 })
