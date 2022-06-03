@@ -45,7 +45,7 @@ app.get('/login', (req, res) => {
   const successMessage = req.flash('successMessage')
 
   res.render('auth/login', {
-    layout: 'auth/login',
+    layout: 'layouts/auth-layout',
     title: 'login',
     flashMessage: { errorMessage, successMessage },
   })
