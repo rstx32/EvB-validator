@@ -135,11 +135,11 @@ app.post('/validate/:type', async (req, res, next) => {
   const isComplaintExist = await checkComplaint()
   if (req.params.type === 'voter' && isComplaintExist.length > 0) {
     req.flash('errorMessage', 'complaint still exist, wait for admin solve')
-    res.redirect('/voters')
+    res.redirect('back')
   } else {
     if (req.params.type === 'voter' || req.params.type === 'candidate') {
       await validate(req.body, req.params.type)
-      res.redirect('/validator')
+      res.redirect('back')
     } else {
       res.redirect(next)
     }
@@ -150,7 +150,7 @@ app.post('/validate/:type', async (req, res, next) => {
 app.post('/solve/:type', async (req, res, next) => {
   if (req.params.type === 'voter' || req.params.type === 'candidate') {
     await acceptSolve(req.body, req.params.type)
-    res.redirect('/validator')
+    res.redirect('back')
   } else {
     res.redirect(next)
   }
