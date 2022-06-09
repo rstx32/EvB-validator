@@ -26,9 +26,10 @@ const app = express()
   .use(express.static('public'))
   .use(
     session({
+      cookie: { maxAge: 1000 * 60 * 60},
       secret: process.env.SESSION_SECRET,
       resave: false,
-      saveUninitialized: true,
+      saveUninitialized: false,
     })
   )
   .use(passport.initialize())
