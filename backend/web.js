@@ -14,7 +14,7 @@ import {
   checkComplaint,
   createAccount,
   sendResetKey,
-  resetPassword
+  resetPassword,
 } from './db.js'
 import Validator from './model/validator.js'
 dotenv.config({ path: 'backend/config/.env' })
@@ -40,16 +40,23 @@ passport.serializeUser(Validator.serializeUser())
 passport.deserializeUser(Validator.deserializeUser())
 
 // auth
-app.get('/login', (req, res) => {
-  const errorMessage = req.flash('errorMessage')
-  const successMessage = req.flash('successMessage')
+app.get(
+  '/login',
+  (req, res, next) => {
+    if (req.isAuthenticated()) res.redirect('/')
+    else next()
+  },
+  (req, res) => {
+    const errorMessage = req.flash('errorMessage')
+    const successMessage = req.flash('successMessage')
 
-  res.render('auth/login', {
-    layout: 'layouts/auth-layout',
-    title: 'Login EvB-validator',
-    flashMessage: { errorMessage, successMessage },
-  })
-})
+    res.render('auth/login', {
+      layout: 'layouts/auth-layout',
+      title: 'EvB-validator Login',
+      flashMessage: { errorMessage, successMessage },
+    })
+  }
+)
 
 app.post(
   '/login',
@@ -95,25 +102,21 @@ app.get('/voters', connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
 })
 
 // candidates
-app.get(
-  '/candidates',
-  connectEnsureLogin.ensureLoggedIn(),
-  async (req, res) => {
-    const user = req.user
-    const candidates = await getCandidates(user._id)
-    const validator = await getSingleValidator(user._id, 'findbyid')
-    const errorMessage = req.flash('errorMessage')
+app.get('/candidates', connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
+  const user = req.user
+  const candidates = await getCandidates(user._id)
+  const validator = await getSingleValidator(user._id, 'findbyid')
+  const errorMessage = req.flash('errorMessage')
 
-    res.render('candidates', {
-      layout: 'layouts/main-layout',
-      title: 'candidates',
-      candidates,
-      user,
-      validator,
-      errorMessage
-    })
-  }
-)
+  res.render('candidates', {
+    layout: 'layouts/main-layout',
+    title: 'candidates',
+    candidates,
+    user,
+    validator,
+    errorMessage,
+  })
+})
 
 // validator
 app.get('/validator', connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
@@ -126,7 +129,7 @@ app.get('/validator', connectEnsureLogin.ensureLoggedIn(), async (req, res) => {
     title: 'validator',
     validator,
     user,
-    errorMessage
+    errorMessage,
   })
 })
 
@@ -237,13 +240,11 @@ app.use((req, res) => {
 })
 
 app.listen(process.env.HTTP_PORT, () => {
-  console.log(
-    `server is listening on http://localhost:${process.env.HTTP_PORT}`
-  )
+  console.log(`EvB validator listening on http://localhost:${process.env.HTTP_PORT}`)
 })
 
 // create validator account for the first time
-;(() => {  
+;(() => {
   const list = process.env.ACCOUNT.split(' ')
   for (let index = 0; index < list.length; index += 2) {
     createAccount(list[index], list[index + 1])
