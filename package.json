@@ -5,7 +5,7 @@
   "main": "/backend/web.js",
   "scripts": {
     "start": "node ./backend/web.js",
-    "dev": "HTTP_PORT=5003 nodemon ./backend/web.js"
+    "dev": "nodemon ./backend/web.js"
   },
   "author": "rstx",
   "license": "ISC",
