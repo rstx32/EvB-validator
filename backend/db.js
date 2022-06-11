@@ -66,7 +66,7 @@ const validate = async (data, type) => {
     )
   }
 
-  isValidatorValidated()
+  await isValidatorValidated()
 }
 
 // check if all validator is validated
@@ -84,11 +84,11 @@ const isValidatorValidated = async () => {
   }
 
   if (voterCount === validators.length) {
-    lockAdmin('voter')
-    sendEmail()
+    await lockAdmin('voter')
+    await sendEmail()
   }
   if (candidateCount === validators.length) {
-    lockAdmin('candidate')
+    await lockAdmin('candidate')
   }
 }
 
@@ -224,6 +224,7 @@ const isAccountExist = async (username) => {
 const createAccount = async (username, email) => {
   const account = await isAccountExist(username)
   const password = randomstring.generate(8)
+  const lowercaseEmail = email.toLowerCase()
 
   if (account === null) {
     // register validator
@@ -237,7 +238,7 @@ const createAccount = async (username, email) => {
         },
         {
           $set: {
-            email: email,
+            email: lowercaseEmail,
           },
         }
       )
@@ -251,7 +252,7 @@ const createAccount = async (username, email) => {
     // send password to validator's email
     mailtrap.sendMail({
       from: 'evb-organizer@evb.com',
-      to: email,
+      to: lowercaseEmail,
       subject: 'EvB Validator Access',
       text: `validator password for access : ${password}`,
     })
@@ -262,13 +263,14 @@ const createAccount = async (username, email) => {
 
 // set reset key to validator's email
 const sendResetKey = async (email) => {
-  const validator = getSingleValidator(email, 'findbyemail')
+  const lowercaseEmail = email.toLowerCase()
+  const validator = getSingleValidator(lowercaseEmail, 'findbyemail')
   if (validator !== null) {
     const randomkey = randomstring.generate(6)
 
     await Validator.updateOne(
       {
-        email: email,
+        email: lowercaseEmail,
       },
       {
         $set: {
@@ -279,7 +281,7 @@ const sendResetKey = async (email) => {
 
     mailtrap.sendMail({
       from: 'evb-organizer@evb.com',
-      to: email,
+      to: lowercaseEmail,
       subject: 'Validator Reset Password',
       text: `validator password reset key : ${randomkey}`,
     })
@@ -292,7 +294,8 @@ const sendResetKey = async (email) => {
 
 // reset password validator
 const resetPassword = async (data) => {
-  const validator = await getSingleValidator(data.email, 'findbyemail')
+  const lowercaseEmail = data.email.toLowerCase()
+  const validator = await getSingleValidator(lowercaseEmail, 'findbyemail')
 
   const result = await Validator.findByUsername(validator.username)
   await result.setPassword(data.password)
