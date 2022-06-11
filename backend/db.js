@@ -187,6 +187,8 @@ const acceptSolve = async (data, type) => {
         }
       )
     }
+
+    await isValidatorValidated()
   } else {
     return console.error('error!')
   }
