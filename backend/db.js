@@ -2,7 +2,7 @@ import Validator from './model/validator.js'
 import { Voter } from './model/voter.js'
 import { Admin } from './model/admin.js'
 import { Complaint } from './model/complaint.js'
-import { gmail, mailtrap } from './email.js'
+import { gmail, mailtrap, ethereal } from './email.js'
 import jsonwebtoken from 'jsonwebtoken'
 import randomstring from 'randomstring'
 import ejs from 'ejs'
@@ -128,8 +128,8 @@ const sendEmail = async () => {
   }
   const voterEmail = extractValue(voters, 'email')
 
-  const sendBulkEmail = (interval) => {
-    setTimeout(async () => {
+  const sendBulkEmail = async (interval) => {
+    // setTimeout(async () => {
       const fileHTML = await ejs.renderFile('views/email.ejs', {
         voter: voters[interval].fullname,
         key: voters[interval].key.registration,
@@ -140,9 +140,9 @@ const sendEmail = async () => {
         subject: 'Voter Registration',
         html: fileHTML,
       }
-      mailtrap.sendMail(mailOptions)
+      ethereal.sendMail(mailOptions)
       console.log(`send email ${interval}`)
-    }, 2500 * interval)
+    // }, 2500 * interval)
   }
 
   for (let i = 0; i < voters.length; i++) {
@@ -252,7 +252,7 @@ const createAccount = async (username, email) => {
     }, 500)
 
     // send password to validator's email
-    mailtrap.sendMail({
+    ethereal.sendMail({
       from: 'evb-organizer@evb.com',
       to: lowercaseEmail,
       subject: 'EvB Validator Access',
@@ -281,7 +281,7 @@ const sendResetKey = async (email) => {
       }
     )
 
-    mailtrap.sendMail({
+    ethereal.sendMail({
       from: 'evb-organizer@evb.com',
       to: lowercaseEmail,
       subject: 'Validator Reset Password',
