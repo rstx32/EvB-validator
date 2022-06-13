@@ -311,12 +311,21 @@ const sendResetKey = async (email) => {
       }
     )
 
+    const fileHTML = await ejs.renderFile('views/email.ejs', {
+      header: `EvB Validator Reset Password`,
+      recipient: `Hi ${username},`,
+      body1: `You are requested for reset password at EvB-Validator, please change your password immediately.`,
+      body2: `here's your secret code key to reset password, do not share with anyone!`,
+      key: randomkey,
+    })
+
     let info = await ethereal.sendMail({
       from: 'evb-organizer@evb.com',
       to: lowercaseEmail,
-      subject: 'Validator Reset Password',
-      text: `validator password reset key : ${randomkey}`,
+      subject: 'EvB | Validator Reset Password',
+      html: fileHTML,
     })
+    
     console.log(`validator reset password sent : ${info.messageId}`)
 
     return true
