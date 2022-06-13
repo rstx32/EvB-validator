@@ -128,26 +128,48 @@ const sendEmail = async () => {
   }
   const voterEmail = extractValue(voters, 'email')
 
-  const sendBulkEmail = async (interval) => {
-    // setTimeout(async () => {
-      const fileHTML = await ejs.renderFile('views/email.ejs', {
-        voter: voters[interval].fullname,
-        key: voters[interval].key.registration,
-      })
-      const mailOptions = {
-        from: 'evb-organizer@evb.com',
-        to: voterEmail[interval],
-        subject: 'Voter Registration',
-        html: fileHTML,
-      }
-      ethereal.sendMail(mailOptions)
-      console.log(`send email ${interval}`)
-    // }, 2500 * interval)
+  for (let interval = 0; interval < voters.length; interval++) {
+    const fileHTML = await ejs.renderFile('views/email.ejs', {
+      header: `EvB Voter Register Key`,
+      recipient: `Hi, ${voters[interval].fullname}`,
+      body1: `You are permitted as voter at E-voting Blockchain, use key below to register at EvB-Admin web.`,
+      body2: `here's your secret key code, do not share with anyone!`,
+      key: voters[interval].key.registration,
+    })
+
+    let info = await ethereal.sendMail({
+      from: 'evb-organizer@evb.com',
+      to: voterEmail[interval],
+      subject: 'EvB | Validator Login Password',
+      html: fileHTML,
+    })
+    console.log(`voter registration sent : ${info.messageId}`)
   }
 
-  for (let i = 0; i < voters.length; i++) {
-    sendBulkEmail(i)
-  }
+  // use this method for MAILTRAP Transporter
+  // const sendBulkEmail = async (interval) => {
+  //   setTimeout(async () => {
+  //     const fileHTML = await ejs.renderFile('views/email.ejs', {
+  //       header: `EvB Voter Register Key`,
+  //       recipient: `Hi, ${voters[interval].fullname}`,
+  //       body1: `You are permitted as voter at E-voting Blockchain, use key below to register at EvB-Admin web.`,
+  //       body2: `here's your secret key code, do not share with anyone!`,
+  //       key: voters[interval].key.registration,
+  //     })
+  
+  //     ethereal.sendMail({
+  //       from: 'evb-organizer@evb.com',
+  //       to: voterEmail[interval],
+  //       subject: 'EvB | Validator Login Password',
+  //       html: fileHTML,
+  //     })
+  //     console.log(`send email ${interval}`)
+  //   }, 2500 * interval)
+  // }
+
+  // for (let interval = 0; interval < voters.length; interval++) {
+  //   sendBulkEmail(interval)
+  // }
 }
 
 // accept solve from admin
@@ -251,13 +273,21 @@ const createAccount = async (username, email) => {
       generateJWT(username)
     }, 500)
 
-    // send password to validator's email
-    ethereal.sendMail({
+    const fileHTML = await ejs.renderFile('views/email.ejs', {
+      header: `EvB Validator Login Password`,
+      recipient: `Hi, ${username}`,
+      body1: `You are permitted as validator at EvB-Validator, use password below to login at EvB-Validator web.`,
+      body2: `here's your new password, do not share with anyone!`,
+      key: password,
+    })
+
+    let info = await ethereal.sendMail({
       from: 'evb-organizer@evb.com',
       to: lowercaseEmail,
-      subject: 'EvB Validator Access',
-      text: `validator password for access : ${password}`,
+      subject: 'EvB | Validator Login Password',
+      html: fileHTML,
     })
+    console.log(`validator password sent : ${info.messageId}`)
   } else {
     return
   }
@@ -281,12 +311,13 @@ const sendResetKey = async (email) => {
       }
     )
 
-    ethereal.sendMail({
+    let info = await ethereal.sendMail({
       from: 'evb-organizer@evb.com',
       to: lowercaseEmail,
       subject: 'Validator Reset Password',
       text: `validator password reset key : ${randomkey}`,
     })
+    console.log(`validator reset password sent : ${info.messageId}`)
 
     return true
   } else {
