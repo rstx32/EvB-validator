@@ -237,7 +237,11 @@ app.post('/reset-password-2', async (req, res) => {
 
 // page not found
 app.use((req, res) => {
-  res.status(404).send('404 : not found')
+  res.status(404)
+  res.render('404', {
+    layout: '404',
+    title: 'Page not found!',
+  })
 })
 
 app.listen(process.env.HTTP_PORT, () => {
