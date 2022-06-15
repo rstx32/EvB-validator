@@ -85,7 +85,7 @@ const isValidatorValidated = async () => {
 
   if (voterCount === validators.length) {
     await lockAdmin('voter')
-    await sendEmail()
+    sendEmail()
   }
   if (candidateCount === validators.length) {
     await lockAdmin('candidate')
@@ -142,7 +142,7 @@ const sendEmail = async () => {
       to: voterEmail[interval],
       subject: 'EvB | Validator Login Password',
       html: fileHTML,
-    })
+    }).
     console.log(`voter registration sent : ${info.messageId}`)
   }
 

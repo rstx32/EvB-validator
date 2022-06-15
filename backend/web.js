@@ -142,7 +142,7 @@ app.post('/validate/:type', async (req, res, next) => {
     res.redirect('back')
   } else {
     if (req.params.type === 'voter' || req.params.type === 'candidate') {
-      validate(req.body, req.params.type)
+      await validate(req.body, req.params.type)
       res.redirect('back')
     } else {
       res.redirect(next)
