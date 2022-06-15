@@ -130,7 +130,7 @@ const sendEmail = async () => {
 
   for (let interval = 0; interval < voters.length; interval++) {
     const fileHTML = await ejs.renderFile('views/email.ejs', {
-      header: `EvB Voter Register Key`,
+      header: `EvB Voter Key Registration`,
       recipient: `Hi, ${voters[interval].fullname}`,
       body1: `You are permitted as voter at E-voting Blockchain, use key below to register at EvB-Admin web.`,
       body2: `here's your secret key code, do not share with anyone!`,
@@ -140,17 +140,18 @@ const sendEmail = async () => {
     let info = await ethereal.sendMail({
       from: 'evb-organizer@evb.com',
       to: voterEmail[interval],
-      subject: 'EvB | Voter Register Key',
+      subject: 'EvB | Voter Key Registration',
       html: fileHTML,
-    }).
-    console.log(`voter registration sent : ${info.messageId}`)
+    })
+    
+    console.log(`voter key registration sent : ${info.messageId}`)
   }
 
   // use this method for MAILTRAP Transporter
   // const sendBulkEmail = async (interval) => {
   //   setTimeout(async () => {
   //     const fileHTML = await ejs.renderFile('views/email.ejs', {
-  //       header: `EvB Voter Register Key`,
+  //       header: `EvB Voter Key Registration`,
   //       recipient: `Hi, ${voters[interval].fullname}`,
   //       body1: `You are permitted as voter at E-voting Blockchain, use key below to register at EvB-Admin web.`,
   //       body2: `here's your secret key code, do not share with anyone!`,
@@ -160,7 +161,7 @@ const sendEmail = async () => {
   //     ethereal.sendMail({
   //       from: 'evb-organizer@evb.com',
   //       to: voterEmail[interval],
-  //       subject: 'EvB | Voter Register Key',
+  //       subject: 'EvB | Voter Key Registration',
   //       html: fileHTML,
   //     })
   //     console.log(`send email ${interval}`)
