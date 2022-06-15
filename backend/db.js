@@ -140,7 +140,7 @@ const sendEmail = async () => {
     let info = await ethereal.sendMail({
       from: 'evb-organizer@evb.com',
       to: voterEmail[interval],
-      subject: 'EvB | Validator Login Password',
+      subject: 'EvB | Voter Register Key',
       html: fileHTML,
     }).
     console.log(`voter registration sent : ${info.messageId}`)
@@ -160,7 +160,7 @@ const sendEmail = async () => {
   //     ethereal.sendMail({
   //       from: 'evb-organizer@evb.com',
   //       to: voterEmail[interval],
-  //       subject: 'EvB | Validator Login Password',
+  //       subject: 'EvB | Voter Register Key',
   //       html: fileHTML,
   //     })
   //     console.log(`send email ${interval}`)
