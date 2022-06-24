@@ -144,7 +144,7 @@ const sendEmail = async () => {
       html: fileHTML,
     })
     
-    console.log(`voter key registration sent : ${info.messageId}`)
+    console.log(`${interval+1}. voter-${voters[interval].fullname} key registration sent : ${info.messageId}`)
   }
 
   // use this method for MAILTRAP Transporter
