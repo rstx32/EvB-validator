@@ -314,7 +314,7 @@ const sendResetKey = async (email) => {
 
     const fileHTML = await ejs.renderFile('views/email.ejs', {
       header: `EvB Validator Reset Password`,
-      recipient: `Hi ${username},`,
+      recipient: `Hi ${validator.username},`,
       body1: `You are requested for reset password at EvB-Validator, please change your password immediately.`,
       body2: `here's your secret code key to reset password, do not share with anyone!`,
       key: randomkey,
