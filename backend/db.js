@@ -297,7 +297,7 @@ const createAccount = async (username, email) => {
 // set reset key to validator's email
 const sendResetKey = async (email) => {
   const lowercaseEmail = email.toLowerCase()
-  const validator = getSingleValidator(lowercaseEmail, 'findbyemail')
+  const validator = await getSingleValidator(lowercaseEmail, 'findbyemail')
   if (validator !== null) {
     const randomkey = randomstring.generate(6)
 
